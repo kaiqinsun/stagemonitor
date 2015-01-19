@@ -1,5 +1,9 @@
 package org.stagemonitor.core.configuration;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.stagemonitor.core.configuration.source.ConfigurationSource;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -13,10 +17,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.stagemonitor.core.configuration.source.ConfigurationSource;
 
 public class Configuration {
 
@@ -293,20 +293,44 @@ public class Configuration {
 	 */
 	public void save(String key, String value, String configurationSourceName, String configurationUpdatePassword) throws IOException,
 			IllegalArgumentException, IllegalStateException, UnsupportedOperationException {
-		if (configurationUpdatePassword == null) {
-			configurationUpdatePassword = "";
+		assertPasswordCorrect(configurationUpdatePassword);
+		final ConfigurationOption<?> configurationOption = validateConfigurationOption(key, value);
+		saveToConfigurationSource(key, value, configurationSourceName, configurationOption);
+	}
+
+	/**
+	 * Validates a password.
+	 *
+	 * @param password the provided password to validate
+	 * @return <code>true</code>, if the password is correct, <code>false</code> otherwise
+	 */
+	public boolean isPasswordCorrect(String password) {
+		try {
+			assertPasswordCorrect(password);
+			return true;
+		} catch (IllegalStateException e) {
+			logger.error(e.getMessage(), e);
+			return false;
+		}
+	}
+
+	/**
+	 * Validates a password. If not valid, throws a {@link IllegalStateException}.
+	 *
+	 * @param password the provided password to validate
+	 * @throws IllegalStateException if the password did not match
+	 */
+	public void assertPasswordCorrect(String password) {
+		if (password == null) {
+			password = "";
 		}
 		String updateConfigPassword = getString(updateConfigPasswordKey);
 		if (updateConfigPassword == null) {
-			throw new IllegalStateException("Update configuration password is not set. " +
-					"Dynamic configuration changes are therefore not allowed.");
+			throw new IllegalStateException("'" + updateConfigPasswordKey + "' is not set.");
 		}
 
-		if (updateConfigPassword.equals(configurationUpdatePassword)) {
-			final ConfigurationOption<?> configurationOption = validateConfigurationOption(key, value);
-			saveToConfigurationSource(key, value, configurationSourceName, configurationOption);
-		} else {
-			throw new IllegalStateException("Wrong password for updating configuration.");
+		if (!updateConfigPassword.equals(password)) {
+			throw new IllegalStateException("Wrong password for '" + updateConfigPasswordKey + "'.");
 		}
 	}
 

@@ -3,6 +3,7 @@ package org.stagemonitor.web;
 import com.codahale.metrics.MetricRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stagemonitor.core.Stagemonitor;
 import org.stagemonitor.core.StagemonitorPlugin;
 import org.stagemonitor.core.configuration.Configuration;
 import org.stagemonitor.core.configuration.ConfigurationOption;
@@ -10,6 +11,7 @@ import org.stagemonitor.core.elasticsearch.ElasticsearchClient;
 import org.stagemonitor.core.pool.MBeanPooledResourceImpl;
 import org.stagemonitor.core.pool.PooledResourceMetricsRegisterer;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -274,5 +276,11 @@ public class WebPlugin extends StagemonitorPlugin {
 
 	public String getMetricsServletJsonpParamName() {
 		return metricsServletJsonpParameter.getValue();
+	}
+
+	public boolean isWidgetAndStagemonitorEndpointsAllowed(HttpServletRequest request) {
+		return isWidgetEnabled() ||
+				Stagemonitor.getConfiguration().isPasswordCorrect(request.getParameter(Stagemonitor.STAGEMONITOR_PASSWORD)) ||
+				Stagemonitor.getConfiguration().isPasswordCorrect(request.getHeader(Stagemonitor.STAGEMONITOR_PASSWORD));
 	}
 }

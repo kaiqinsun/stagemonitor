@@ -15,7 +15,7 @@ public class BommerangJsHtmlInjectorTest {
 
 	@Test
 	public void testBommerangJsExistsAndHashIsCorrect() throws Exception {
-		final String location = "/META-INF/resources/stagemonitor/static/rum/" + BommerangJsHtmlInjector.BOOMERANG_FILENAME;
+		final String location = "/META-INF/resources/rum/" + BommerangJsHtmlInjector.BOOMERANG_FILENAME;
 		final InputStream inputStream = getClass().getResourceAsStream(location);
 		assertNotNull(inputStream);
 
