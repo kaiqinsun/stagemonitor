@@ -1,17 +1,11 @@
 package org.stagemonitor.core.configuration;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Pattern;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.stagemonitor.core.configuration.converter.BooleanValueConverter;
 import org.stagemonitor.core.configuration.converter.IntegerValueConverter;
+import org.stagemonitor.core.configuration.converter.JsonValueConverter;
 import org.stagemonitor.core.configuration.converter.LongValueConverter;
 import org.stagemonitor.core.configuration.converter.RegexListValueConverter;
 import org.stagemonitor.core.configuration.converter.RegexMapValueConverter;
@@ -19,6 +13,13 @@ import org.stagemonitor.core.configuration.converter.StringValueConverter;
 import org.stagemonitor.core.configuration.converter.StringsValueConverter;
 import org.stagemonitor.core.configuration.converter.ValueConverter;
 import org.stagemonitor.core.configuration.source.ConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * Represents a configuration option
@@ -64,6 +65,10 @@ public class ConfigurationOption<T> {
 	 */
 	public static  ConfigurationOptionBuilder<String> stringOption() {
 		return new ConfigurationOptionBuilder<String>(STRING_VALUE_CONVERTER, String.class);
+	}
+
+	public static <T> ConfigurationOptionBuilder<T> jsonOption(Class<T> clazz) {
+		return new ConfigurationOptionBuilder<T>(new JsonValueConverter<T>(clazz), clazz);
 	}
 
 	/**
