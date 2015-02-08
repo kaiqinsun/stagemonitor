@@ -33,8 +33,6 @@ var tableRenderer = (function () {
 		});
 		metricTables.push(metricTable);
 		metricTable.table = $(metricTable.bindto).dataTable({
-			"bJQueryUI": true,
-			"sPaginationType": "full_numbers",
 			"bLengthChange": false,
 			"aoColumns": aoColumns
 		});
